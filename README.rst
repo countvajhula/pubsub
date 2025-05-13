@@ -18,9 +18,9 @@ A basic publish/subscribe system for Emacs.
 
 Topics are keys in a dynamically-bound, toplevel hash table. The value of a topic is a list of subscribers to it. Each subscriber is a ("callback") function that accepts a single argument.
 
-New notices may be published on any topic, and all subscribers to that topic are called with the notice as the only argument.
+New notices may be published on any topic, and all subscribers to that topic are called with the notice as the only argument, at the time of publication. Notices are not persisted.
 
-Notices could be anything, i.e., each notice is a value of any type. The pubsub system simply forwards it to each subscriber.
+Notices could be anything, i.e., each notice is a value of any type. The pubsub broker simply forwards it to each subscriber.
 
 Non-Ownership
 -------------
