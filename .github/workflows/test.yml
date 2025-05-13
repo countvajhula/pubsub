@@ -1,0 +1,71 @@
+name: build
+
+on: [push, pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs_version:
+          - '27.1'
+          - 'snapshot'
+    name: Test on Emacs ${{ matrix.emacs_version }}
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - name: Install Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.emacs_version }}
+      - name: Install Cask
+        uses: conao3/setup-cask@master
+        with:
+          version: 'snapshot'
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install Package and its Dependencies
+        run: make install
+      - name: Lint
+        run: make lint
+      - name: Check Docstrings
+        continue-on-error: true
+        run: make checkdoc
+      - name: Byte Compile
+        run: make build
+      - name: Run Tests
+        run: make test
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Report Coverage
+    environment: test-env
+    env:
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          architecture: 'x64'
+      - name: Install Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 'snapshot'
+      - name: Install Cask
+        uses: conao3/setup-cask@master
+        with:
+          version: 'snapshot'
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install Package and its Dependencies
+        run: make install
+      - name: Report Coverage
+        run: make cover-coveralls
