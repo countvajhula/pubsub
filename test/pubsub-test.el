@@ -89,6 +89,13 @@
     (pubsub-subscribe fixture-topic-2 subscriber2)
     (funcall body)))
 
+(defun fixture-subscriber (notice)
+  notice)
+
+(defun fixture-named-subscriber (body)
+  (pubsub-subscribe fixture-topic-1 #'fixture-subscriber)
+  (funcall body))
+
 ;;
 ;; Tests
 ;;
@@ -116,5 +123,18 @@
     (with-fixture fixture-many-subscribers-to-many-topics
       (pubsub-publish fixture-topic-2 "hi")
       (should-not (equal "hi" result))
-      (should (equal "hi" result2)))))
+      (should (equal "hi" result2))))
+
+  (with-fixture fixture-empty-board
+    (with-fixture fixture-named-subscriber
+      (should (member #'fixture-subscriber
+                      (gethash fixture-topic-1 pubsub-board))))))
+
+(ert-deftest unsubscribe-test ()
+
+  (with-fixture fixture-empty-board
+    (with-fixture fixture-named-subscriber
+      (pubsub-unsubscribe fixture-topic-1 #'fixture-subscriber)
+      (should-not (member #'fixture-subscriber
+                          (gethash fixture-topic-1 pubsub-board))))))
 

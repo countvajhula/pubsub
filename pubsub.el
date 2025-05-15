@@ -55,5 +55,18 @@ invoked with each fresh notice on TOPIC."
                  (gethash topic pubsub-board))
            pubsub-board))
 
+(defun pubsub-unsubscribe (topic callback)
+  "Unsubscribe from TOPIC.
+
+This removes CALLBACK from the list of subscribers to TOPIC.
+
+Note that, in general, only named callbacks may be unsubscribed,
+as anonymous lambdas cannot easily be identified for removal."
+  (puthash topic
+           (remove callback
+                   (gethash topic pubsub-board))
+           pubsub-board))
+
+
 (provide 'pubsub)
 ;;; pubsub.el ends here
