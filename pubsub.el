@@ -33,14 +33,23 @@
   "All topics and lists of their subscribers.")
 
 (defun pubsub-publish (topic notice)
-  "Publish NOTICE to TOPIC."
+  "Publish NOTICE to TOPIC.
+
+This notifies each subscriber to TOPIC of the fresh NOTICE.
+
+The notification is performed as a simple function invocation, where
+each subscriber function (callback) to TOPIC is invoked with the fresh
+NOTICE as the only argument."
   (dolist (subscriber (gethash topic pubsub-board))
     (funcall subscriber notice)))
 
 (defun pubsub-subscribe (topic callback)
   "Subscribe to TOPIC.
 
-CALLBACK will be invoked with fresh notices on TOPIC."
+This adds CALLBACK to the list of subscribers to TOPIC.
+
+CALLBACK must be a function accepting a single argument.  It will be
+invoked with each fresh notice on TOPIC."
   (puthash topic
            (cons callback
                  (gethash topic pubsub-board))
