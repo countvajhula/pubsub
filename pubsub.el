@@ -3,7 +3,7 @@
 ;; Author: Sid Kasivajhula <sid@countvajhula.com>
 ;; URL: https://github.com/countvajhula/pubsub
 ;; Version: 0.0
-;; Package-Requires: ((emacs "25.1") (dynaring "0.3"))
+;; Package-Requires: ((emacs "24.1"))
 
 ;; This file is NOT a part of Gnu Emacs.
 
