@@ -1,4 +1,4 @@
-;;; pubsub.el --- Pubsubs, not macros! -*- lexical-binding: t -*-
+;;; pubsub.el --- A basic publish/subscribe system -*- lexical-binding: t -*-
 
 ;; Author: Sid Kasivajhula <sid@countvajhula.com>
 ;; URL: https://github.com/countvajhula/pubsub
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; Pubsubs, not macros!
+;; A basic publish/subscribe system.
 
 ;;; Code:
 
