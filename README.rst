@@ -16,7 +16,7 @@ pubsub
 ======
 A basic publish/subscribe system for Emacs.
 
-Topics are keys in a dynamically-bound, toplevel hash table. The value of a topic is a list of subscribers to it. Each subscriber is a ("callback") function that accepts a single argument.
+Topics are keys in a dynamically-bound, toplevel hash table. The value of a topic is a list of subscribers to it. Each subscriber is a function (a "callback") that accepts a single argument.
 
 New notices may be published on any topic, and all subscribers to that topic are called with the notice as the only argument, at the time of publication. Notices are not persisted.
 
