@@ -29,7 +29,7 @@
 ;;; Code:
 
 (defvar pubsub-board
-  (make-hash-table)
+  (make-hash-table :test 'equal)
   "All topics and lists of their subscribers.")
 
 (defun pubsub-publish (topic notice)
