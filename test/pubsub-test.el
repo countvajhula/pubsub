@@ -50,7 +50,8 @@
       ,@test)))
 
 (defun fixture-empty-board (body)
-  (let ((pubsub-board (make-hash-table)))
+  (let ((pubsub-board (make-hash-table))
+        (pubsub-subscriber-directory (make-hash-table)))
     (unwind-protect
         (funcall body)
       ;; perhaps aid garbage collection
@@ -60,20 +61,33 @@
 
 (defvar fixture-topic-2 "topic-2")
 
+(defvar fixture-subscriber-name "hks")
+
+(defvar fixture-subscriber-name-2 "vjs")
+
+(defun fixture-subscriber-callback (notice)
+  notice)
+
 (defun fixture-single-subscriber (body)
   (let* ((result nil)
-         (subscriber (lambda (notice)
-                       (setq result notice))))
+         (callback (lambda (notice)
+                     (setq result notice)))
+         (subscriber (pubsub-make-subscriber fixture-subscriber-name
+                                             callback)))
     (pubsub-subscribe fixture-topic-1 subscriber)
     (funcall body)))
 
 (defun fixture-many-subscribers-to-one-topic (body)
   (let* ((result nil)
          (result2 nil)
-         (subscriber (lambda (notice)
-                       (setq result notice)))
-         (subscriber2 (lambda (notice)
-                        (setq result2 notice))))
+         (callback (lambda (notice)
+                     (setq result notice)))
+         (callback2 (lambda (notice)
+                      (setq result2 notice)))
+         (subscriber (pubsub-make-subscriber fixture-subscriber-name
+                                             callback))
+         (subscriber2 (pubsub-make-subscriber fixture-subscriber-name-2
+                                              callback2)))
     (pubsub-subscribe fixture-topic-1 subscriber)
     (pubsub-subscribe fixture-topic-1 subscriber2)
     (funcall body)))
@@ -81,60 +95,65 @@
 (defun fixture-many-subscribers-to-many-topics (body)
   (let* ((result nil)
          (result2 nil)
-         (subscriber (lambda (notice)
-                       (setq result notice)))
-         (subscriber2 (lambda (notice)
-                        (setq result2 notice))))
+         (callback (lambda (notice)
+                     (setq result notice)))
+         (callback2 (lambda (notice)
+                      (setq result2 notice)))
+         (subscriber (pubsub-make-subscriber fixture-subscriber-name
+                                             callback))
+         (subscriber2 (pubsub-make-subscriber fixture-subscriber-name-2
+                                              callback2)))
     (pubsub-subscribe fixture-topic-1 subscriber)
     (pubsub-subscribe fixture-topic-2 subscriber2)
     (funcall body)))
-
-(defun fixture-subscriber (notice)
-  notice)
-
-(defun fixture-named-subscriber (body)
-  (pubsub-subscribe fixture-topic-1 #'fixture-subscriber)
-  (funcall body))
 
 ;;
 ;; Tests
 ;;
 
-(ert-deftest pubsub-test ()
+(ert-deftest publish-test ()
 
+  ;; publishing should notify subscriber
   (with-fixture fixture-empty-board
     (with-fixture fixture-single-subscriber
       (pubsub-publish fixture-topic-1 "hi")
       (should (equal "hi" result))))
 
+  ;; publishing should notify all subscribers
   (with-fixture fixture-empty-board
     (with-fixture fixture-many-subscribers-to-one-topic
       (pubsub-publish fixture-topic-1 "hi")
       (should (equal "hi" result))
       (should (equal "hi" result2))))
 
-  (with-fixture fixture-empty-board
-    (with-fixture fixture-many-subscribers-to-many-topics
-      (pubsub-publish fixture-topic-1 "hi")
-      (should (equal "hi" result))
-      (should-not (equal "hi" result2))))
-
+  ;; publishing should not notify subscribers to other topics
   (with-fixture fixture-empty-board
     (with-fixture fixture-many-subscribers-to-many-topics
       (pubsub-publish fixture-topic-2 "hi")
-      (should-not (equal "hi" result))
-      (should (equal "hi" result2))))
+      (should-not (equal "hi" result)))))
 
+(ert-deftest subscribe-test ()
+
+  ;; subscribing creates a directory entry
   (with-fixture fixture-empty-board
-    (with-fixture fixture-named-subscriber
-      (should (member #'fixture-subscriber
+    (let ((subscriber (pubsub-make-subscriber fixture-subscriber-name
+                                              #'fixture-subscriber-callback)))
+      (pubsub-subscribe fixture-topic-1 subscriber)
+      (should (gethash fixture-subscriber-name pubsub-subscriber-directory))))
+
+  ;; subscribing adds subscriber to topic by name
+  (with-fixture fixture-empty-board
+    (let ((subscriber (pubsub-make-subscriber fixture-subscriber-name
+                                              #'fixture-subscriber-callback)))
+      (pubsub-subscribe fixture-topic-1 subscriber)
+      (should (member fixture-subscriber-name
                       (gethash fixture-topic-1 pubsub-board))))))
 
 (ert-deftest unsubscribe-test ()
 
+  ;; unsubscribe removes subscriber name from topic
   (with-fixture fixture-empty-board
-    (with-fixture fixture-named-subscriber
-      (pubsub-unsubscribe fixture-topic-1 #'fixture-subscriber)
-      (should-not (member #'fixture-subscriber
+    (with-fixture fixture-single-subscriber
+      (pubsub-unsubscribe fixture-topic-1 fixture-subscriber-name)
+      (should-not (member fixture-subscriber-name
                           (gethash fixture-topic-1 pubsub-board))))))
-

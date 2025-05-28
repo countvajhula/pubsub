@@ -32,6 +32,30 @@
   (make-hash-table :test 'equal)
   "All topics and lists of their subscribers.")
 
+(defvar pubsub-subscriber-directory
+  (make-hash-table :test 'equal)
+  "Subscriber names and callbacks.
+
+This allows us to subscribe and unsubscribe by name, rather than
+directly by callback which may not be reliably identifiable if it is
+an anonymous lambda.")
+
+(defun pubsub-make-subscriber (name callback)
+  "Make a subscriber whose name is NAME and who should be notified via CALLBACK.
+
+This is just a cons cell. But the interface is provided for data
+abstraction, in case the subscriber type needs additional metadata in
+the future."
+  (cons name callback))
+
+(defun pubsub-subscriber-name (subscriber)
+  "The name of SUBSCRIBER."
+  (car subscriber))
+
+(defun pubsub-subscriber-callback (subscriber)
+  "The callback for SUBSCRIBER."
+  (cdr subscriber))
+
 (defun pubsub-publish (topic notice)
   "Publish NOTICE to TOPIC.
 
@@ -40,30 +64,37 @@ This notifies each subscriber to TOPIC of the fresh NOTICE.
 The notification is performed as a simple function invocation, where
 each subscriber function (callback) to TOPIC is invoked with the fresh
 NOTICE as the only argument."
-  (dolist (subscriber (gethash topic pubsub-board))
-    (funcall subscriber notice)))
+  (dolist (subscriber-name (gethash topic pubsub-board))
+    (let ((callback (gethash subscriber-name
+                             pubsub-subscriber-directory)))
+      (funcall callback notice))))
 
-(defun pubsub-subscribe (topic callback)
+(defun pubsub-subscribe (topic subscriber)
   "Subscribe to TOPIC.
 
 This adds CALLBACK to the list of subscribers to TOPIC.
 
 CALLBACK must be a function accepting a single argument.  It will be
 invoked with each fresh notice on TOPIC."
-  (puthash topic
-           (cons callback
-                 (gethash topic pubsub-board))
-           pubsub-board))
+  (let ((name (pubsub-subscriber-name subscriber))
+        (callback (pubsub-subscriber-callback subscriber)))
+    (puthash topic
+             (cons name
+                   (gethash topic pubsub-board))
+             pubsub-board)
+    (puthash name
+             callback
+             pubsub-subscriber-directory)))
 
-(defun pubsub-unsubscribe (topic callback)
-  "Unsubscribe from TOPIC.
+(defun pubsub-unsubscribe (topic subscriber-name)
+  "Unsubscribe SUBSCRIBER-NAME from TOPIC.
 
 This removes CALLBACK from the list of subscribers to TOPIC.
 
 Note that, in general, only named callbacks may be unsubscribed,
 as anonymous lambdas cannot easily be identified for removal."
   (puthash topic
-           (remove callback
+           (remove subscriber-name
                    (gethash topic pubsub-board))
            pubsub-board))
 
