@@ -57,13 +57,13 @@
       ;; perhaps aid garbage collection
       (setq pubsub-board nil))))
 
-(defvar fixture-topic-1 "topic-1")
+(defconst fixture-topic-1 "topic-1")
 
-(defvar fixture-topic-2 "topic-2")
+(defconst fixture-topic-2 "topic-2")
 
-(defvar fixture-subscriber-name "hks")
+(defconst fixture-subscriber-name "hks")
 
-(defvar fixture-subscriber-name-2 "vjs")
+(defconst fixture-subscriber-name-2 "vjs")
 
 (defun fixture-subscriber-callback (notice)
   notice)
