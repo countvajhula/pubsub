@@ -57,7 +57,7 @@ NOTICE as the only argument."
   "Subscribe to TOPIC.
 
 This adds CALLBACK as a subscriber to TOPIC, using SUBSCRIBER-NAME to
-identify the subscriber. The SUBSCRIBER-NAME is used to identify
+identify the subscriber.  The SUBSCRIBER-NAME is used to identify
 duplicate subscribers (e.g., if a subscriber with that name already
 exists, the new one will not be added redundantly) and also may be
 used to subsequently unsubscribe the CALLBACK from TOPIC.
