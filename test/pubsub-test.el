@@ -71,10 +71,10 @@
 (defun fixture-single-subscriber (body)
   (let* ((result nil)
          (callback (lambda (notice)
-                     (setq result notice)))
-         (subscriber (pubsub-make-subscriber fixture-subscriber-name
-                                             callback)))
-    (pubsub-subscribe fixture-topic-1 subscriber)
+                     (setq result notice))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name
+                      callback)
     (funcall body)))
 
 (defun fixture-many-subscribers-to-one-topic (body)
@@ -83,13 +83,13 @@
          (callback (lambda (notice)
                      (setq result notice)))
          (callback2 (lambda (notice)
-                      (setq result2 notice)))
-         (subscriber (pubsub-make-subscriber fixture-subscriber-name
-                                             callback))
-         (subscriber2 (pubsub-make-subscriber fixture-subscriber-name-2
-                                              callback2)))
-    (pubsub-subscribe fixture-topic-1 subscriber)
-    (pubsub-subscribe fixture-topic-1 subscriber2)
+                      (setq result2 notice))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name
+                      callback)
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name-2
+                      callback2)
     (funcall body)))
 
 (defun fixture-many-subscribers-to-many-topics (body)
@@ -98,13 +98,13 @@
          (callback (lambda (notice)
                      (setq result notice)))
          (callback2 (lambda (notice)
-                      (setq result2 notice)))
-         (subscriber (pubsub-make-subscriber fixture-subscriber-name
-                                             callback))
-         (subscriber2 (pubsub-make-subscriber fixture-subscriber-name-2
-                                              callback2)))
-    (pubsub-subscribe fixture-topic-1 subscriber)
-    (pubsub-subscribe fixture-topic-2 subscriber2)
+                      (setq result2 notice))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name
+                      callback)
+    (pubsub-subscribe fixture-topic-2
+                      fixture-subscriber-name-2
+                      callback2)
     (funcall body)))
 
 ;;
@@ -136,18 +136,18 @@
 
   ;; subscribing creates a directory entry
   (with-fixture fixture-empty-board
-    (let ((subscriber (pubsub-make-subscriber fixture-subscriber-name
-                                              #'fixture-subscriber-callback)))
-      (pubsub-subscribe fixture-topic-1 subscriber)
-      (should (gethash fixture-subscriber-name pubsub-subscriber-directory))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name
+                      #'fixture-subscriber-callback)
+    (should (gethash fixture-subscriber-name pubsub-subscriber-directory)))
 
   ;; subscribing adds subscriber to topic by name
   (with-fixture fixture-empty-board
-    (let ((subscriber (pubsub-make-subscriber fixture-subscriber-name
-                                              #'fixture-subscriber-callback)))
-      (pubsub-subscribe fixture-topic-1 subscriber)
-      (should (member fixture-subscriber-name
-                      (gethash fixture-topic-1 pubsub-board))))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-name
+                      #'fixture-subscriber-callback)
+    (should (member fixture-subscriber-name
+                    (gethash fixture-topic-1 pubsub-board)))))
 
 (ert-deftest unsubscribe-test ()
 
