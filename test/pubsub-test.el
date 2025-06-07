@@ -33,6 +33,8 @@
 
 (require 'pubsub)
 
+(require 'cl-lib)
+
 ;;
 ;; Fixtures
 ;;
@@ -147,7 +149,23 @@
                       fixture-subscriber-name
                       #'fixture-subscriber-callback)
     (should (member fixture-subscriber-name
-                    (gethash fixture-topic-1 pubsub-board)))))
+                    (gethash fixture-topic-1 pubsub-board))))
+
+  ;; subscriber isn't subscribed more than once
+  (with-fixture fixture-empty-board
+                (pubsub-subscribe fixture-topic-1
+                                  fixture-subscriber-name
+                                  #'fixture-subscriber-callback)
+                (pubsub-subscribe fixture-topic-1
+                                  fixture-subscriber-name
+                                  #'fixture-subscriber-callback)
+                (puthash fixture-topic-1
+                         (cl-remove fixture-subscriber-name
+                                    (gethash fixture-topic-1 pubsub-board)
+                                    :count 1)
+                         pubsub-board)
+                (should-not (member fixture-subscriber-name
+                                    (gethash fixture-topic-1 pubsub-board)))))
 
 (ert-deftest unsubscribe-test ()
 

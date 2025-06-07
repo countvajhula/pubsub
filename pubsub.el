@@ -65,8 +65,9 @@ used to subsequently unsubscribe the CALLBACK from TOPIC.
 CALLBACK must be a function accepting a single argument.  It will be
 invoked with each fresh notice on TOPIC."
   (puthash topic
-           (cons subscriber-name
-                 (gethash topic pubsub-board))
+           (delete-dups
+            (cons subscriber-name
+                  (gethash topic pubsub-board)))
            pubsub-board)
   (puthash subscriber-name
            callback
