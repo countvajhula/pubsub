@@ -85,6 +85,10 @@ as anonymous lambdas cannot easily be identified for removal."
                    (gethash topic pubsub-board))
            pubsub-board))
 
+(defun pubsub-subscribers (topic)
+  "List subscribers to TOPIC."
+  (gethash topic pubsub-board))
+
 
 (provide 'pubsub)
 ;;; pubsub.el ends here

@@ -175,3 +175,10 @@
       (pubsub-unsubscribe fixture-topic-1 fixture-subscriber-name)
       (should-not (member fixture-subscriber-name
                           (gethash fixture-topic-1 pubsub-board))))))
+
+(ert-deftest subscribers-test ()
+
+  (with-fixture fixture-empty-board
+    (with-fixture fixture-many-subscribers-to-one-topic
+      (should (member "vjs" (pubsub-subscribers fixture-topic-1)))
+      (should (member "hks" (pubsub-subscribers fixture-topic-1))))))
