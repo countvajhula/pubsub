@@ -67,6 +67,8 @@
 
 (defconst fixture-subscriber-name-2 "vjs")
 
+(defconst fixture-subscriber-with-error-name "oops")
+
 (defun fixture-subscriber-callback (notice)
   notice)
 
@@ -78,6 +80,21 @@
                       fixture-subscriber-name
                       callback)
     (funcall body)))
+
+(defun fixture-single-subscriber-with-error (body)
+  (let* ((result nil)
+         (callback (lambda (notice)
+                     (error "whoopsies")
+                     (setq result notice))))
+    (pubsub-subscribe fixture-topic-1
+                      fixture-subscriber-with-error-name
+                      callback)
+    (let ((output-buffer (generate-new-buffer "*captured messages*")))
+      (unwind-protect
+          ;; TODO: this doesn't work to suppress output
+          (with-output-to-temp-buffer output-buffer
+            (funcall body))
+        (kill-buffer output-buffer)))))
 
 (defun fixture-many-subscribers-to-one-topic (body)
   (let* ((result nil)
@@ -132,7 +149,14 @@
   (with-fixture fixture-empty-board
     (with-fixture fixture-many-subscribers-to-many-topics
       (pubsub-publish fixture-topic-2 "hi")
-      (should-not (equal "hi" result)))))
+      (should-not (equal "hi" result))))
+
+  (with-fixture fixture-empty-board
+    (with-fixture fixture-single-subscriber-with-error
+      (pubsub-publish fixture-topic-1 "hi")
+      (should-not (equal "hi" result))
+      (should-not (member fixture-subscriber-with-error-name
+                          (gethash fixture-topic-1 pubsub-board))))))
 
 (ert-deftest subscribe-test ()
 

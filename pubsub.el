@@ -51,7 +51,14 @@ NOTICE as the only argument."
   (dolist (subscriber-name (gethash topic pubsub-board))
     (let ((callback (gethash subscriber-name
                              pubsub-subscriber-directory)))
-      (funcall callback notice))))
+      (condition-case nil
+          (funcall callback notice)
+        (error
+         (pubsub-unsubscribe topic subscriber-name)
+         (message "Error in subscriber %s on receiving notice %s on topic %s.\n They have been unsubscribed. Please fix the error and resubscribe."
+                  subscriber-name
+                  notice
+                  topic))))))
 
 (defun pubsub-subscribe (topic subscriber-name callback)
   "Subscribe to TOPIC.
