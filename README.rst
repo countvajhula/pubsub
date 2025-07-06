@@ -14,12 +14,11 @@
 
 pubsub
 ======
-A basic publish/subscribe system for Emacs.
+A basic `publish/subscribe <https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern>`_ system for Emacs.
 
-About the pub/sub pattern
--------------------------
+Pubsub is for decoupling — allowing different pieces of code to talk to each other without being directly connected. A function call, for instance, is the simplest way to pass data from one place to another, and it can be thought of as entailing a single, directly connected, publisher and subscriber pair. The pub/sub model is, in a way, the opposite of that, where the "publisher" simply does its job and places the result somewhere, and everyone interested ("subscribers," who may be added and removed dynamically) gets to hear about it.
 
-Publish/subscribe is a standard architectural pattern in software development generally, and this package implements a version of it for Emacs. It is useful in cases where different parts of an application, whether in the same module or across modules and packages, need to communicate but without being coupled in any way.
+This pattern is most useful when one component needs to announce something (e.g., the result of some work that it did) without needing to know who might be listening or what they might do with that information. It's useful in cases where different parts of an application, whether in the same module or across modules and packages, need to communicate but without being coupled in any way.
 
 About this Implementation
 -------------------------
