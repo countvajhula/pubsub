@@ -20,6 +20,11 @@ Pubsub is for decoupling — allowing different pieces of code to talk to each o
 
 This pattern is most useful when one component needs to announce something (e.g., the result of some work that it did) without needing to know who might be listening or what they might do with that information. It's useful in cases where different parts of an application, whether in the same module or across modules and packages, need to communicate but without being coupled in any way.
 
+Installation
+------------
+
+Pubsub is on `MELPA <https://melpa.org/>`_, so you can install it in the usual way using your package manager of choice (e.g., `Straight.el <https://github.com/radian-software/straight.el>`_, `Elpaca <https://github.com/progfolio/elpaca>`_, or Emacs's built-in package.el), after ensuring you have MELPA in your configured list of package archives.
+
 About this Implementation
 -------------------------
 
