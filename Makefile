@@ -6,13 +6,6 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 EMACS=emacs
 CASK ?= cask
 
-INIT_PACKAGE_EL="(progn  \
-  (require 'package)  \
-  (push '(\"melpa\" . \"http://melpa.org/packages/\") package-archives)  \
-  (package-initialize)  \
-  (unless package-archive-contents \
-     (package-refresh-contents)))"
-
 PROJECT_FILES=`${CASK} files`
 
 help:
@@ -33,7 +26,6 @@ install:
 
 lint:
 	${CASK} exec $(EMACS) -Q --batch  \
-	                      --eval $(INIT_PACKAGE_EL)  \
 	                      -l "package-lint.el"  \
 	                      --eval "(setq package-lint-main-file \"pubsub.el\")" \
 	                      -f "package-lint-batch-and-exit"  \
