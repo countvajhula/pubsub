@@ -5,4 +5,7 @@
 # Build
 .cask
 *.elc
+*.html
 dist
+emacs-ci
+coverage

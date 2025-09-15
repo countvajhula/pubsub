@@ -1,51 +1,56 @@
-# Determine this makefile's path.
-# Be sure to place this BEFORE `include` directives, if any.
-# Source: https://stackoverflow.com/a/27132934/323874
-THIS_FILE := $(lastword $(MAKEFILE_LIST))
-
 EMACS=emacs
-CASK ?= cask
 
-PROJECT_FILES=`${CASK} files`
+# For a single-package repo, CI_PROJECT is optional.
+# CI_PACKAGES contains the single package name.
+export CI_PACKAGES=pubsub
 
 help:
-	@echo "clean - remove all build artifacts"
-	@echo "install - install package dependencies in .cask/"
-	@echo "lint - check style with package-lint"
-	@echo "lint+less - lint piped to less"
-	@echo "lint-no-noise - lint with typically noisy warnings filtered out"
-	@echo "checkdoc - check docstrings"
-	@echo "build - byte compile the package"
-	@echo "test - run tests"
+	@echo "Run common development actions."
+	@echo
+	@echo "setup-ci         - Clone the emacs-ci repo."
+	@echo "bootstrap        - Install Straight.el."
+	@echo "install          - Install package dependencies."
+	@echo "build            - Byte compile the package."
+	@echo "lint             - Check style with package-lint."
+	@echo "checkdoc         - Check docstrings."
+	@echo "test             - Run ERT tests."
+	@echo "cover-local      - Run tests and generate a local coverage report."
+	@echo "cover-coveralls  - Run tests and report coverage to Coveralls (for CI)."
 
-clean :
-	${CASK} clean-elc
+setup-ci:
+	git clone https://github.com/countvajhula/emacs-ci.git
+
+clean:
+	cd emacs-ci && rm -rf ci-init
+
+bootstrap:
+	cd emacs-ci && emacs --batch --quick --load bootstrap.el
 
 install:
-	${CASK} install
+	cd emacs-ci && emacs --batch --quick --load install.el
+
+build:
+	cd emacs-ci && emacs --batch --quick --load build.el
 
 lint:
-	${CASK} exec $(EMACS) -Q --batch  \
-	                      -l "package-lint.el"  \
-	                      --eval "(setq package-lint-main-file \"pubsub.el\")" \
-	                      -f "package-lint-batch-and-exit"  \
-	                      ${PROJECT_FILES}
+	cd emacs-ci && emacs --batch --quick --load lint.el
 
 checkdoc:
-	${CASK} exec $(EMACS) -Q --batch  \
-	                      -l "dev/build-utils.el"  \
-	                      --eval '(flycheck/batch-checkdoc ".")'
-
-build :
-	${CASK} build
+	cd emacs-ci && emacs --batch --quick --load checkdoc.el
 
 test: build
-	${CASK} exec ert-runner
+	cd emacs-ci && emacs --batch --quick --load test.el
 
-cover-coveralls:
-	${CASK} exec ert-runner -l test/undercover-helper.el
+cover-local: install
+	# Ensure the target directory exists at the project root.
+	mkdir -p coverage
+	# Export the variables to ensure they are reliably passed to the subprocess.
+	# Force undercover to run
+	export UNDERCOVER_FORCE=true && \
+	export UNDERCOVER_CONFIG='("*.el" (:report-file "coverage/local-report.json") (:report-format text) (:send-report nil))' && \
+	cd emacs-ci && emacs --batch --quick --load coverage.el
 
-cover-local:
-	UNDERCOVER_FORCE=true UNDERCOVER_CONFIG='("*.el" (:report-file "coverage/local-report.json") (:report-format text) (:send-report nil))' ${CASK} exec ert-runner
+cover-coveralls: install
+	cd emacs-ci && emacs --batch --quick --load coverage.el
 
-.PHONY:	help lint checkdoc build clean install test cover-local cover-coveralls
+.PHONY: help setup-ci clean bootstrap install build lint checkdoc test cover-local cover-coveralls
