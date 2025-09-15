@@ -1,8 +1,8 @@
 .. image:: https://github.com/countvajhula/pubsub/actions/workflows/test.yml/badge.svg
     :target: https://github.com/countvajhula/pubsub/actions
 
-.. image:: https://coveralls.io/repos/github/countvajhula/pubsub/badge.svg?branch=master
-    :target: https://coveralls.io/github/countvajhula/pubsub?branch=master
+.. image:: https://coveralls.io/repos/github/countvajhula/pubsub/badge.svg?branch=main
+    :target: https://coveralls.io/github/countvajhula/pubsub?branch=main
 
 .. image:: https://melpa.org/packages/pubsub-badge.svg
     :alt: MELPA
