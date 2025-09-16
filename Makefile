@@ -18,7 +18,13 @@ help:
 	@echo "cover-coveralls  - Run tests and report coverage to Coveralls (for CI)."
 
 setup-ci:
-	git clone https://github.com/countvajhula/emacs-ci.git .emacs-ci
+	@if [ -d ".emacs-ci" ]; then \
+		echo "--> Updating existing emacs-ci repository..."; \
+		cd .emacs-ci && git pull; \
+	else \
+		echo "--> Cloning emacs-ci repository..."; \
+		git clone https://github.com/countvajhula/emacs-ci.git .emacs-ci; \
+	fi
 
 clean:
 	cd .emacs-ci && rm -rf ci-init
