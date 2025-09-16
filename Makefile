@@ -18,28 +18,28 @@ help:
 	@echo "cover-coveralls  - Run tests and report coverage to Coveralls (for CI)."
 
 setup-ci:
-	git clone https://github.com/countvajhula/emacs-ci.git .emacs-ci.clone
+	git clone https://github.com/countvajhula/emacs-ci.git .emacs-ci
 
 clean:
-	cd .emacs-ci.clone && rm -rf ci-init
+	cd .emacs-ci && rm -rf ci-init
 
 bootstrap:
-	cd .emacs-ci.clone && emacs --batch --quick --load bootstrap.el
+	cd .emacs-ci && emacs --batch --quick --load bootstrap.el
 
 install:
-	cd .emacs-ci.clone && emacs --batch --quick --load install.el
+	cd .emacs-ci && emacs --batch --quick --load install.el
 
 build:
-	cd .emacs-ci.clone && emacs --batch --quick --load build.el
+	cd .emacs-ci && emacs --batch --quick --load build.el
 
 lint:
-	cd .emacs-ci.clone && emacs --batch --quick --load lint.el
+	cd .emacs-ci && emacs --batch --quick --load lint.el
 
 checkdoc:
-	cd .emacs-ci.clone && emacs --batch --quick --load checkdoc.el
+	cd .emacs-ci && emacs --batch --quick --load checkdoc.el
 
 test: build
-	cd .emacs-ci.clone && emacs --batch --quick --load test.el
+	cd .emacs-ci && emacs --batch --quick --load test.el
 
 cover-local: install
 	# Ensure the target directory exists at the project root.
@@ -48,9 +48,9 @@ cover-local: install
 	# Force undercover to run
 	export UNDERCOVER_FORCE=true && \
 	export UNDERCOVER_CONFIG='("*.el" (:report-file "coverage/local-report.json") (:report-format text) (:send-report nil))' && \
-	cd .emacs-ci.clone && emacs --batch --quick --load coverage.el
+	cd .emacs-ci && emacs --batch --quick --load coverage.el
 
 cover-coveralls: install
-	cd .emacs-ci.clone && emacs --batch --quick --load coverage.el
+	cd .emacs-ci && emacs --batch --quick --load coverage.el
 
 .PHONY: help setup-ci clean bootstrap install build lint checkdoc test cover-local cover-coveralls
