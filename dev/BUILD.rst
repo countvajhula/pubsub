@@ -33,7 +33,7 @@ Build steps
 
 .. code-block:: bash
 
-  make build
+  make byte-compile
 
 6. Test in MELPA sandbox
 

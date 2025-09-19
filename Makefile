@@ -10,7 +10,8 @@ help:
 	@echo "setup-ci         - Clone the emacs-ci repo."
 	@echo "bootstrap        - Install Straight.el."
 	@echo "install          - Install package dependencies."
-	@echo "build            - Byte compile the package."
+	@echo "byte-compile     - Byte compile the package."
+	@echo "native-compile   - Native compile the package."
 	@echo "lint             - Check style with package-lint."
 	@echo "checkdoc         - Check docstrings."
 	@echo "test             - Run ERT tests."
@@ -35,8 +36,11 @@ bootstrap:
 install:
 	cd .emacs-ci && emacs --batch --quick --load install.el
 
-build:
-	cd .emacs-ci && emacs --batch --quick --load build.el
+byte-compile:
+	cd .emacs-ci && emacs --batch --quick --load byte-compile.el
+
+native-compile:
+	cd .emacs-ci && emacs --batch --quick --load native-compile.el
 
 lint:
 	cd .emacs-ci && emacs --batch --quick --load lint.el
@@ -44,7 +48,7 @@ lint:
 checkdoc:
 	cd .emacs-ci && emacs --batch --quick --load checkdoc.el
 
-test: build
+test: byte-compile
 	cd .emacs-ci && emacs --batch --quick --load test.el
 
 cover-local: install
@@ -59,4 +63,4 @@ cover-local: install
 cover-coveralls: install
 	cd .emacs-ci && emacs --batch --quick --load coverage.el
 
-.PHONY: help setup-ci clean bootstrap install build lint checkdoc test cover-local cover-coveralls
+.PHONY: help setup-ci clean bootstrap install byte-compile native-compile lint checkdoc test cover-local cover-coveralls
